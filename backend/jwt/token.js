@@ -7,9 +7,8 @@ export const generateTokenAndSaveInCookies = async (userId, res) => {
   });
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
+    secure: true,   // ✅ Needed for HTTPS (Render + Vercel)
+    sameSite: "none",  // ✅ Needed for cross-origin cookies
   });
 
   await User.findByIdAndUpdate(userId, { token });
