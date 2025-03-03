@@ -17,15 +17,18 @@ const DB_URI = process.env.MONGODB_URI;
 // Middleware (Correct Order)
 app.use(cookieParser()); // ✅ Parses cookies before JSON
 app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "https://todo-app-rho-murex-36.vercel.app",
-    credentials: true,  // ✅ Must be true
-    methods: "GET,POST,PUT,DELETE",
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin: "https://todo-app-rho-murex-36.vercel.app", // Your frontend URL
+  credentials: true, // ✅ Required for cookies
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
+// ✅ Apply CORS middleware before routes
+app.use(cors(corsOptions));
+
+// ✅ Manually add CORS headers for OPTIONS (preflight requests)
+app.options("*", cors(corsOptions));
 
 // Debug Cookies
 app.get("/check-cookies", (req, res) => {
