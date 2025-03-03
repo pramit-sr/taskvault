@@ -10,26 +10,27 @@ function Home() {
   const [newTodo, setNewTodo] = useState("");
 
   useEffect(() => {
-    const fetchtodos = async () => {
+    const fetchTodos = async () => {
       try {
         setLoading(true);
         const response = await axios.get("https://todo-app-backend-jblt.onrender.com/todo/fetch", {
           withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
-        console.log(response.data.todos);
+  
+        console.log("Fetch Response:", response); // Log response
         setTodos(response.data.todos);
         setError(null);
       } catch (error) {
+        console.error("Fetch Error:", error.response ? error.response.data : error.message);
         setError("Failed to fetch todos");
       } finally {
         setLoading(false);
       }
     };
-    fetchtodos();
+    fetchTodos();
   }, []);
+  
 
   const todoCreate = async () => {
     if (!newTodo) return;
