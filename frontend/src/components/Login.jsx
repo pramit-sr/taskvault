@@ -66,7 +66,7 @@ function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Type Username"
+                  placeholder="Type Password"
                 />
               </div>
 
