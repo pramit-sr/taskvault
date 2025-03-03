@@ -41,6 +41,9 @@ app.get("/set-cookie", (req, res) => {
   });
   res.json({ message: "Test cookie set!" });
 });
+app.get("/", (req, res) => {
+  res.send("🚀 Backend is running!");
+});
 
 // Database Connection
 const connectDB = async () => {
