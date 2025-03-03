@@ -19,7 +19,7 @@ app.use(cookieParser()); // ✅ Parses cookies before JSON
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Ensure this matches your frontend
+    origin: process.env.FRONTEND_URL || "https://todo-app-rho-murex-36.vercel.app", // Ensure this matches your frontend
     credentials: true, // ✅ Needed for cookies
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
