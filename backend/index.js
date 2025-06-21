@@ -2,51 +2,66 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import todoRoute from "./routes/todo.route.js";
-import userRoute from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 
+import todoRoute from "./routes/todo.route.js";
+import userRoute from "./routes/user.route.js";
+
 dotenv.config();
-console.log("JWT_SECRET_KEY:", process.env.JWT_SECRET_KEY);
 
 const app = express();
 
+// Config
 const PORT = process.env.PORT || 3001;
 const DB_URI = process.env.MONGODB_URI;
 
-// Middleware (Correct Order)
-app.use(cookieParser()); // ✅ Parses cookies before JSON
-app.use(express.json());
+// ✅ Allowed frontends (local + deployed)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://todo-app-rho-murex-36.vercel.app",
+  "https://taskvault.guddusarkar-com.workers.dev"
+];
+
+// ✅ CORS Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "https://todo-app-rho-murex-36.vercel.app",
-    credentials: true,  // ✅ Must be true
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
+// ✅ Parse cookies & JSON
+app.use(cookieParser());
+app.use(express.json());
 
-// Debug Cookies
+// ✅ Debug test routes
 app.get("/check-cookies", (req, res) => {
   console.log("Received Cookies:", req.cookies);
   res.json({ cookies: req.cookies });
 });
 
-// Set Test Cookie
 app.get("/set-cookie", (req, res) => {
   res.cookie("testCookie", "HelloWorld", {
     httpOnly: true,
-    secure: false, // Change to true if using HTTPS
-    sameSite: "Lax", // Adjust as needed
+    secure: process.env.NODE_ENV === "production", // ✅ true if deployed
+    sameSite: "Lax",
   });
   res.json({ message: "Test cookie set!" });
 });
+
 app.get("/", (req, res) => {
   res.send("🚀 Backend is running!");
 });
 
-// Database Connection
+// ✅ MongoDB connection
 const connectDB = async () => {
   try {
     await mongoose.connect(DB_URI, {
@@ -61,11 +76,11 @@ const connectDB = async () => {
 };
 connectDB();
 
-// Routes
+// ✅ API routes
 app.use("/todo", todoRoute);
 app.use("/user", userRoute);
 
-// Start Server
+// ✅ Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
