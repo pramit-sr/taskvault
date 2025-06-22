@@ -19,8 +19,10 @@ const DB_URI = process.env.MONGODB_URI;
 const allowedOrigins = [
   "http://localhost:5173",
   "https://todo-app-rho-murex-36.vercel.app",
-  "https://taskvault.guddusarkar-com.workers.dev"
+  "https://taskvault.guddusarkar-com.workers.dev",
+  "https://taskvault.duckdns.org"  // ✅ add this line
 ];
+
 
 // ✅ CORS Middleware
 app.use(
