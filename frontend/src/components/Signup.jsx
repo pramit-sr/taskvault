@@ -13,7 +13,7 @@ function Signup() {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "https://todo-app-backend-jblt.onrender.com/user/signup",
+      `${import.meta.env.VITE_BACKEND_URL}/user/signup`,
         {
           username,
           email,
