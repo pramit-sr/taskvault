@@ -20,7 +20,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://todo-app-rho-murex-36.vercel.app",
   "https://taskvault.guddusarkar-com.workers.dev",
-  "https://taskvault.duckdns.org"  // ✅ add this line
+  "https://taskvault.duckdns.org",  // ✅ add this line,
+  "http://taskvlt.duckdns.org"
 ];
 
 

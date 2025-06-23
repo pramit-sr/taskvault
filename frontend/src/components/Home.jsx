@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [todos, setTodos] = useState([]);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [newTodo, setNewTodo] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -18,13 +19,13 @@ function Home() {
         setLoading(true);
         const response = await axios.get(`${BACKEND_URL}/todo/fetch`, {
           withCredentials: true,
-          headers: { "Content-Type": "application/json" },
         });
         setTodos(response.data.todos);
+        setIsAuthenticated(true);
         setError(null);
       } catch (error) {
-        console.error(error);
-        setError("Failed to fetch todos");
+        // Not authenticated or failed to fetch
+        setIsAuthenticated(false);
       } finally {
         setLoading(false);
       }
@@ -37,10 +38,7 @@ function Home() {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/todo/create`,
-        {
-          text: newTodo,
-          completed: false,
-        },
+        { text: newTodo, completed: false },
         { withCredentials: true }
       );
       setTodos([...todos, response.data.newTodo]);
@@ -59,8 +57,8 @@ function Home() {
         { withCredentials: true }
       );
       setTodos(todos.map((t) => (t._id === id ? response.data.todo : t)));
-    } catch (error) {
-      toast.error("Failed to update todo status");
+    } catch {
+      toast.error("Failed to update status");
     }
   };
 
@@ -70,7 +68,7 @@ function Home() {
         withCredentials: true,
       });
       setTodos(todos.filter((t) => t._id !== id));
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete todo");
     }
   };
@@ -80,15 +78,42 @@ function Home() {
       await axios.get(`${BACKEND_URL}/user/logout`, {
         withCredentials: true,
       });
-      toast.success("User logged out successfully");
-      localStorage.removeItem("jwt");
+      toast.success("User logged out");
+      setIsAuthenticated(false);
       navigateTo("/login");
-    } catch (error) {
-      toast.error("Error logging out");
+    } catch {
+      toast.error("Logout failed");
     }
   };
 
   const remainingTodos = todos.filter((todo) => !todo.completed).length;
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center bg-white p-8 rounded-lg shadow-xl max-w-md">
+          <h1 className="text-3xl font-bold mb-4">Welcome to TaskVault</h1>
+          <p className="text-gray-600 mb-6">
+            The most secure and elegant task management app.
+          </p>
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={() => navigateTo("/login")}
+              className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-800 transition"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => navigateTo("/signup")}
+              className="px-6 py-2 rounded-md bg-gray-200 hover:bg-gray-300 transition"
+            >
+              Sign Up
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="my-10 bg-gray-100 max-w-lg lg:max-w-xl rounded-lg shadow-lg mx-8 sm:mx-auto p-6">
@@ -119,7 +144,7 @@ function Home() {
           {todos.map((todo) => (
             <li
               key={todo._id}
-              className="flex items-center justify-between p-3 bg-gray-100 rounded-md"
+              className="flex items-center justify-between p-3 bg-white rounded-md"
             >
               <div className="flex items-center">
                 <input
